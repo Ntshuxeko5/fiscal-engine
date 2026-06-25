@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".github/workflows/ci.yml" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="global.json" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Fiscal.Console/Fiscal.Console.csproj" />
+    <Project Path="src/Fiscal.Core/Fiscal.Core.csproj" />
+    <Project Path="src/Fiscal.Infrastructure/Fiscal.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Fiscal.Tests/Fiscal.Tests.csproj" />
+  </Folder>
+</Solution>

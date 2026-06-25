@@ -1,0 +1,23 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- Matches your installed SDK - keep this in sync with global.json below -->
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- This is your "type checking" - nullable reference types catch
+         a huge class of null-reference bugs at compile time -->
+    <Nullable>enable</Nullable>
+
+    <!-- Don't let warnings slide silently in CI - if the compiler warns,
+         the build fails -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+</Project>

@@ -62,6 +62,13 @@ public class DynamicRecord
 
         return Array.Empty<DynamicRecord>();
     }
+
+
+
+    /// <summary>
+    /// Exposes field keys so the JSON converter can iterate them.
+    /// </summary>
+    public IEnumerable<string> Keys => _fields.Keys;
 }
 
 /// <summary>

@@ -34,4 +34,11 @@ public class FiscalContext
     /// True once step 4 (PrintSlip) has successfully completed.
     /// </summary>
     public bool SlipPrinted { get; set; }
+
+    /// <summary>
+    /// The transaction mode, resolved once by the orchestrator
+    /// after ReadCheck completes. Null until that point.
+    /// Credit mode = TotalDue below zero. Universal rule, engine-enforced.
+    /// </summary>
+    public TransactionMode? Mode { get; set; }
 }

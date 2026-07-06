@@ -1,0 +1,42 @@
+{
+  "TenderMediaNumber": 4,
+  "ModeValues": {
+    "Invoice": "INVOICE",
+    "Credit": "CREDIT"
+  },
+  "StaticValues": {
+    "SellerName": "Acme Restaurant Group",
+    "SellerTaxNumber": "4123456789",
+    "CurrencyCode": "ZAR",
+    "DeviceCode": "FD-100",
+    "FolioType": "INVOICE"
+  },
+  "Payload": {
+    "DocumentInfo": {
+      "FolioType": "Mode:documentType",
+      "DeviceCode": "Config:DeviceCode",
+      "FiscalId": "Generated:guid",
+      "OriginalFiscalNo": "Input:fiscalNo"
+    },
+    "SellerInfo": {
+      "Name": "Config:SellerName",
+      "TaxNumber": "Config:SellerTaxNumber",
+      "Currency": "Config:CurrencyCode"
+    },
+    "FolioInfo": {
+      "TransactionId": "OpsContext.TransactionId",
+      "CashierId": "OpsContext.CashierId",
+      "Timestamp": "Generated:timestamp",
+      "TotalDue": "OpsContext.TotalDue",
+      "LineTotal": "Calc:lineTotal"
+    },
+    "Postings": [
+      {
+        "Sku": "OpsContext.Sku",
+        "Name": "OpsContext.Name",
+        "Quantity": "OpsContext.Quantity",
+        "Amount": "OpsContext.Amount"
+      }
+    ]
+  }
+}

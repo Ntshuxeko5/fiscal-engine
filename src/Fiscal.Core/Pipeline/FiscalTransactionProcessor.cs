@@ -49,6 +49,13 @@ namespace Fiscal.Core.Pipeline
             // ── Step 1: Read check ────────────────────────────────────────────
             FiscalContext context = await _checkReader.ReadAsync(posCheckInput);
 
+            // Detect transaction mode - universal rule, not per-client config.
+            // Negative amount due = credit against a previous invoice.
+            decimal totalDue = context.Check.Data.Get<decimal>("TotalDue");
+            context.Mode = totalDue < 0
+                ? TransactionMode.Credit
+                : TransactionMode.Invoice;
+
             // ── Step 2: Validate ──────────────────────────────────────────────
             // B2B tax number check happens here, before we ever touch the
             // fiscal device. Cheap to check, expensive to get wrong.

@@ -22,6 +22,7 @@ namespace Fiscal.Tests.Pipeline
         {
             return new FiscalTransactionProcessor(
                 new FakeCheckReader(),
+                new FakeOperatorInputCollector(),   // ← add this
                 new B2BTransactionValidator(),
                 new FakePayloadBuilder(),
                 fiscalClient,

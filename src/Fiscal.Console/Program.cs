@@ -7,6 +7,7 @@ using Fiscal.Core.Pipeline;
 using Fiscal.Core.Transformations;
 using Fiscal.Core.Validation;
 using Fiscal.Infrastructure.Fakes;
+using Fiscal.Infrastructure.Printing;
 using System.Text.Json;
 
 Console.WriteLine("=== Fiscal Engine - Console Runner ===");
@@ -58,10 +59,14 @@ ITransactionValidator validator = new B2BTransactionValidator();
 IFiscalPayloadBuilder builder = new FiscalPayloadBuilder(engineConfig, resolvers);
 FakeFiscalClient fiscalClient = new FakeFiscalClient();
 FakePaymentClient paymentClient = new FakePaymentClient();
-ISlipPrinter slipPrinter = new FakeSlipPrinter();
+ISlipPrinter slipPrinter = engineConfig.SlipConfig is not null
+    ? new ConfigDrivenSlipPrinter(engineConfig.SlipConfig)
+    : new FakeSlipPrinter();
+IOperatorInputCollector inputCollector = new FakeOperatorInputCollector();
 
 var processor = new FiscalTransactionProcessor(
     checkReader,
+    inputCollector,
     validator,
     builder,
     fiscalClient,
@@ -118,8 +123,11 @@ fiscalClient.ShouldFail = false;
 paymentClient.Reset();
 
 ICheckReader creditCheckReader = new FakeCreditCheckReader();
+IOperatorInputCollector creditInputCollector =
+    new FakeOperatorInputCollector(fiscalNo: "FISC-20260701-0001");
 var creditProcessor = new FiscalTransactionProcessor(
     creditCheckReader,
+    creditInputCollector,
     validator,
     builder,
     fiscalClient,
@@ -145,3 +153,4 @@ else
 
 Console.WriteLine();
 Console.WriteLine("=== Done ===");
+

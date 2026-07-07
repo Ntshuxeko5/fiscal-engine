@@ -22,17 +22,14 @@ namespace Fiscal.Infrastructure.Fakes
                 {
                     ["TransactionId"] = "TXN-CREDIT-001",
                     ["CashierId"] = "CSH-42",
-                    ["TotalDue"] = -150.00m,   // negative = credit
+                    ["TotalDue"] = -150.00m,
                     ["IsB2B"] = false,
                     ["LineItems"] = new List<DynamicRecord>()
                 }));
 
-            var context = new FiscalContext { Check = check };
-
-            // Operator enters the original fiscal number being credited
-            context.OperatorInput.Set("fiscalNo", "FISC-20260701-0001");
-
-            return Task.FromResult(context);
+            // OperatorInput deliberately NOT set here - the
+            // IOperatorInputCollector handles that now
+            return Task.FromResult(new FiscalContext { Check = check });
         }
     }
 }

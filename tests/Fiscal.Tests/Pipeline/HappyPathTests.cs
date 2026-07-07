@@ -19,6 +19,7 @@ namespace Fiscal.Tests.Pipeline
         {
             var processor = new FiscalTransactionProcessor(
                 new FakeCheckReader(),
+                new FakeOperatorInputCollector(),   // ← add this
                 new B2BTransactionValidator(),
                 new FakePayloadBuilder(),
                 new FakeFiscalClient(),
@@ -37,6 +38,7 @@ namespace Fiscal.Tests.Pipeline
         {
             var processor = new FiscalTransactionProcessor(
                 new FakeCheckReader(),
+                new FakeOperatorInputCollector(),   // ← add this
                 new B2BTransactionValidator(),
                 new FakePayloadBuilder(),
                 new FakeFiscalClient(),
@@ -53,6 +55,7 @@ namespace Fiscal.Tests.Pipeline
         {
             var processor = new FiscalTransactionProcessor(
                 new FakeCheckReader(),
+                new FakeOperatorInputCollector(),   // ← add this
                 new B2BTransactionValidator(),
                 new FakePayloadBuilder(),
                 new FakeFiscalClient(),
@@ -69,6 +72,7 @@ namespace Fiscal.Tests.Pipeline
         {
             var processor = new FiscalTransactionProcessor(
                 new FakeCheckReader(),
+                new FakeOperatorInputCollector(),   // ← add this
                 new B2BTransactionValidator(),
                 new FakePayloadBuilder(),
                 new FakeFiscalClient(),

@@ -24,6 +24,7 @@ namespace Fiscal.Tests.Validation
 
             var processor = new FiscalTransactionProcessor(
                 new FakeB2BCheckReader(),
+                new FakeOperatorInputCollector(),   // ← add this
                 new B2BTransactionValidator(),
                 new FakePayloadBuilder(),
                 fiscalClient,
@@ -44,7 +45,8 @@ namespace Fiscal.Tests.Validation
         public async Task NonB2BTransaction_SkipsB2BValidation_Succeeds()
         {
             var processor = new FiscalTransactionProcessor(
-                new FakeCheckReader(),        // IsB2B = false
+                new FakeCheckReader(),
+                new FakeOperatorInputCollector(),   // ← add this
                 new B2BTransactionValidator(),
                 new FakePayloadBuilder(),
                 new FakeFiscalClient(),

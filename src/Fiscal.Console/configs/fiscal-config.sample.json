@@ -11,6 +11,64 @@
     "DeviceCode": "FD-100",
     "FolioType": "INVOICE"
   },
+  "SlipConfig": {
+    "Width": 40,
+    "Sections": [
+      { "Type": "line" },
+      {
+        "Type": "text",
+        "Value": "FISCAL RECEIPT",
+        "Align": "center"
+      },
+      { "Type": "line" },
+      {
+        "Type": "field",
+        "Label": "Transaction",
+        "FieldValue": "OpsContext.TransactionId"
+      },
+      {
+        "Type": "field",
+        "Label": "Cashier",
+        "FieldValue": "OpsContext.CashierId"
+      },
+      {
+        "Type": "field",
+        "Label": "Fiscal No.",
+        "FieldValue": "FiscalResult.FiscalReceiptNumber"
+      },
+      {
+        "Type": "field",
+        "Label": "Tender",
+        "FieldValue": "PaymentOutcome.TenderMediaNumber",
+        "IncludeIf": "OpsContext.TotalDue > 0"
+      },
+      { "Type": "line" },
+      {
+        "Type": "items",
+        "LabelField": "OpsContext.Name",
+        "ValueField": "OpsContext.Amount"
+      },
+      { "Type": "line" },
+      {
+        "Type": "field",
+        "Label": "Service Charge",
+        "FieldValue": "OpsContext.ServiceCharge",
+        "IncludeIf": "OpsContext.ServiceCharge > 0"
+      },
+      {
+        "Type": "field",
+        "Label": "Total",
+        "FieldValue": "OpsContext.TotalDue"
+      },
+      { "Type": "line" },
+      {
+        "Type": "text",
+        "Value": "Thank you for your visit!",
+        "Align": "center"
+      },
+      { "Type": "line" }
+    ]
+  },
   "Payload": {
     "DocumentInfo": {
       "FolioType": "Mode:documentType",
@@ -28,7 +86,15 @@
       "CashierId": "OpsContext.CashierId",
       "Timestamp": "Generated:timestamp",
       "TotalDue": "OpsContext.TotalDue",
-      "LineTotal": "Calc:lineTotal"
+      "LineTotal": "Calc:lineTotal",
+      "ServiceCharge": {
+        "Value": "OpsContext.ServiceCharge",
+        "IncludeIf": "OpsContext.ServiceCharge > 0"
+      },
+      "TipAmount": {
+        "Value": "OpsContext.TipAmount",
+        "IncludeIf": "OpsContext.TipAmount > 0"
+      }
     },
     "Postings": [
       {

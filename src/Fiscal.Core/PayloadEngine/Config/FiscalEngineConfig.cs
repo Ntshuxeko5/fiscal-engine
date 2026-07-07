@@ -40,5 +40,11 @@ namespace Fiscal.Core.PayloadEngine.Config
         /// pattern as the fiscal payload engine.
         /// </summary>
         public SlipConfig? SlipConfig { get; init; }
+
+        /// <summary>
+        /// Config for the B2B buyer information form.
+        /// Null means this client does not support B2B transactions.
+        /// </summary>
+        public BuyerInfoFormConfig? BuyerInfoForm { get; init; }
     }
 }

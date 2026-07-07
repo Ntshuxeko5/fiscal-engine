@@ -104,5 +104,27 @@
         "Amount": "OpsContext.Amount"
       }
     ]
+  },
+  "BuyerInfoForm": {
+    "TriggerLabel": "B2B Sale",
+    "Fields": [
+      {
+        "Key": "BuyerTaxNumber",
+        "Label": "Tax Number",
+        "Required": true,
+        "Min": 9,
+        "Max": 9
+      },
+      {
+        "Key": "BuyerName",
+        "Label": "Company Name",
+        "Required": true
+      },
+      {
+        "Key": "BuyerAddress",
+        "Label": "Address",
+        "Required": false
+      }
+    ]
   }
 }

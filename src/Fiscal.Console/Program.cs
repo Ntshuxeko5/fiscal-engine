@@ -151,6 +151,80 @@ else
     Console.WriteLine($"Reason             : {creditResult.FailureReason}");
 }
 
+// ── Scenario 4: B2B transaction ───────────────────────────────────────────
+Console.WriteLine(">> Scenario 4: B2B transaction");
+Console.WriteLine();
+
+fiscalClient.ShouldFail = false;
+paymentClient.Reset();
+
+ICheckReader b2bCheckReader = new FakeB2BCheckReader();
+
+// Simulate operator filling in the B2B form correctly
+IOperatorInputCollector b2bInputCollector = new FakeOperatorInputCollector(
+    buyerValues: new Dictionary<string, string>
+    {
+        ["BuyerTaxNumber"] = "123456789",  // exactly 9 chars - passes Min=Max=9
+        ["BuyerName"] = "Acme Corp",
+        ["BuyerAddress"] = "123 Main St"
+    });
+
+// Wire validator with form config
+var b2bValidator = new B2BTransactionValidator(engineConfig.BuyerInfoForm);
+
+var b2bProcessor = new FiscalTransactionProcessor(
+    b2bCheckReader,
+    b2bInputCollector,
+    b2bValidator,
+    builder,
+    fiscalClient,
+    paymentClient,
+    slipPrinter);
+
+var b2bResult = await b2bProcessor.ProcessAsync(new object());
+
+if (b2bResult.IsSuccess)
+{
+    Console.WriteLine("B2B transaction completed successfully.");
+}
+else
+{
+    Console.WriteLine($"Pipeline failed at : {b2bResult.FailedAtStage}");
+    Console.WriteLine($"Reason             : {b2bResult.FailureReason}");
+}
+
+Console.WriteLine();
+Console.WriteLine("────────────────────────────────────────");
+Console.WriteLine();
+
+// ── Scenario 5: B2B with invalid tax number ───────────────────────────────
+Console.WriteLine(">> Scenario 5: B2B with invalid tax number (too short)");
+Console.WriteLine();
+
+paymentClient.Reset();
+
+IOperatorInputCollector badB2BCollector = new FakeOperatorInputCollector(
+    buyerValues: new Dictionary<string, string>
+    {
+        ["BuyerTaxNumber"] = "12345",  // only 5 chars - fails Min=9
+        ["BuyerName"] = "Acme Corp"
+    });
+
+var badB2BProcessor = new FiscalTransactionProcessor(
+    b2bCheckReader,
+    badB2BCollector,
+    b2bValidator,
+    builder,
+    fiscalClient,
+    paymentClient,
+    slipPrinter);
+
+var badB2BResult = await badB2BProcessor.ProcessAsync(new object());
+
+Console.WriteLine($"Pipeline stopped at : {badB2BResult.FailedAtStage}");
+Console.WriteLine($"Reason              : {badB2BResult.FailureReason}");
+Console.WriteLine($"Payment was called  : {paymentClient.WasCalled}");
+
 Console.WriteLine();
 Console.WriteLine("=== Done ===");
 

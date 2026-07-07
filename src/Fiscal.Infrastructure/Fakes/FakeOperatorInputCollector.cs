@@ -18,39 +18,29 @@ namespace Fiscal.Infrastructure.Fakes
     public class FakeOperatorInputCollector : IOperatorInputCollector
     {
         private readonly string? _fiscalNo;
-        private readonly string? _buyerTaxNumber;
-        private readonly string? _buyerName;
+        private readonly Dictionary<string, string> _buyerValues;
 
         public FakeOperatorInputCollector(
             string? fiscalNo = null,
-            string? buyerTaxNumber = null,
-            string? buyerName = null)
+            Dictionary<string, string>? buyerValues = null)
         {
             _fiscalNo = fiscalNo;
-            _buyerTaxNumber = buyerTaxNumber;
-            _buyerName = buyerName;
+            _buyerValues = buyerValues ?? new Dictionary<string, string>();
         }
 
         public Task CollectAsync(FiscalContext context)
         {
-            // Credit transaction - supply the original fiscal number
             if (context.Mode == TransactionMode.Credit &&
                 _fiscalNo is not null)
             {
                 context.OperatorInput.Set("fiscalNo", _fiscalNo);
             }
 
-            // B2B transaction - supply buyer information
             if (context.Check.Data.Get<bool>("IsB2B"))
             {
-                if (_buyerTaxNumber is not null)
+                foreach (var (key, value) in _buyerValues)
                 {
-                    context.OperatorInput.Set("BuyerTaxNumber", _buyerTaxNumber);
-                }
-
-                if (_buyerName is not null)
-                {
-                    context.OperatorInput.Set("BuyerName", _buyerName);
+                    context.OperatorInput.Set(key, value);
                 }
             }
 

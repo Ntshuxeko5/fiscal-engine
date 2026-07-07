@@ -21,7 +21,7 @@ namespace Fiscal.Infrastructure.Fakes
                 {
                     ["TransactionId"] = "TXN-0001",
                     ["CashierId"] = "CSH-42",
-                    ["TotalDue"] = 150.00m,
+                    ["TotalDue"] = 175.00m,
                     ["IsB2B"] = false,
                     ["ServiceCharge"] = 15.00m,   // should appear in payload
                     ["TipAmount"] = 0m,       // should NOT appear in payload

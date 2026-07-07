@@ -7,21 +7,10 @@ using System.Text;
 
 namespace Fiscal.Core.Pipeline
 {
-    /// <summary>
-    /// The single entry point for a fiscal transaction.
-    /// Runs all four steps in a fixed, unbypassable order:
-    ///   1. Read check
-    ///   2. Validate (B2B rule)
-    ///   3. Fiscalize — this is the gate
-    ///   4. Run payment (only if fiscal succeeded)
-    ///   5. Print slip
-    ///
-    /// No step can be reordered, skipped, or called independently
-    /// from outside this class. The order is the business rule.
-    /// </summary>
     public class FiscalTransactionProcessor
     {
         private readonly ICheckReader _checkReader;
+        private readonly IOperatorInputCollector _inputCollector;
         private readonly ITransactionValidator _validator;
         private readonly IFiscalPayloadBuilder _payloadBuilder;
         private readonly IFiscalClient _fiscalClient;
@@ -30,6 +19,7 @@ namespace Fiscal.Core.Pipeline
 
         public FiscalTransactionProcessor(
             ICheckReader checkReader,
+            IOperatorInputCollector inputCollector,
             ITransactionValidator validator,
             IFiscalPayloadBuilder payloadBuilder,
             IFiscalClient fiscalClient,
@@ -37,6 +27,7 @@ namespace Fiscal.Core.Pipeline
             ISlipPrinter slipPrinter)
         {
             _checkReader = checkReader;
+            _inputCollector = inputCollector;
             _validator = validator;
             _payloadBuilder = payloadBuilder;
             _fiscalClient = fiscalClient;
@@ -49,16 +40,21 @@ namespace Fiscal.Core.Pipeline
             // ── Step 1: Read check ────────────────────────────────────────────
             FiscalContext context = await _checkReader.ReadAsync(posCheckInput);
 
-            // Detect transaction mode - universal rule, not per-client config.
-            // Negative amount due = credit against a previous invoice.
+            // ── Step 2: Detect transaction mode ──────────────────────────────
+            // Universal rule: negative total = credit against previous invoice.
+            // Lives in the engine, not config. Output value is configurable.
             decimal totalDue = context.Check.Data.Get<decimal>("TotalDue");
             context.Mode = totalDue < 0
                 ? TransactionMode.Credit
                 : TransactionMode.Invoice;
 
-            // ── Step 2: Validate ──────────────────────────────────────────────
-            // B2B tax number check happens here, before we ever touch the
-            // fiscal device. Cheap to check, expensive to get wrong.
+            // ── Step 3: Collect operator input ────────────────────────────────
+            // Prompts operator for credit fiscalNo, B2B buyer info, etc.
+            // Writes collected values to context.OperatorInput.
+            // No-op if nothing needs to be collected for this transaction.
+            await _inputCollector.CollectAsync(context);
+
+            // ── Step 4: Validate ──────────────────────────────────────────────
             FiscalValidationResult validation = _validator.Validate(context);
             if (!validation.IsValid)
             {
@@ -66,12 +62,10 @@ namespace Fiscal.Core.Pipeline
                     validation.FailureReason ?? "Validation failed.");
             }
 
-            // ── Step 3: Build payload + Fiscalize (the gate) ──────────────────
-            // The payload builder resolves config + check data into the exact
-            // JSON shape this client's fiscal device expects.
-            // If fiscalization fails, everything stops here.
+            // ── Step 5: Build payload + Fiscalize (the gate) ──────────────────
             DynamicRecord payload = _payloadBuilder.Build(context);
-            DynamicRecord fiscalResult = await _fiscalClient.FiscalizeAsync(payload, context);
+            DynamicRecord fiscalResult =
+                await _fiscalClient.FiscalizeAsync(payload, context);
             context.FiscalResult = fiscalResult;
 
             bool fiscalSucceeded = fiscalResult.Get<bool>("Success");
@@ -79,19 +73,15 @@ namespace Fiscal.Core.Pipeline
             {
                 string reason = fiscalResult.Get<string>("ErrorMessage")
                     ?? "Fiscal device returned a failure response.";
-
                 return FiscalPipelineResult.FiscalFailed(reason);
             }
 
-            // ── Step 4: Run payment ───────────────────────────────────────────
-            // Only reachable if fiscal succeeded. This is not a coincidence -
-            // there is no code path from a failed fiscal to this line.
-            DynamicRecord paymentOutcome = await _paymentClient.RunPaymentAsync(context);
+            // ── Step 6: Run payment ───────────────────────────────────────────
+            DynamicRecord paymentOutcome =
+                await _paymentClient.RunPaymentAsync(context);
             context.PaymentOutcome = paymentOutcome;
 
-            // ── Step 5: Print slip ────────────────────────────────────────────
-            // Context now carries check data, fiscal result, and payment outcome -
-            // everything the receipt needs.
+            // ── Step 7: Print slip ────────────────────────────────────────────
             await _slipPrinter.PrintAsync(context);
             context.SlipPrinted = true;
 

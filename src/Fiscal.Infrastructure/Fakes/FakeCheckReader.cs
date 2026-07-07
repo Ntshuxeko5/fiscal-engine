@@ -23,6 +23,8 @@ namespace Fiscal.Infrastructure.Fakes
                     ["CashierId"] = "CSH-42",
                     ["TotalDue"] = 150.00m,
                     ["IsB2B"] = false,
+                    ["ServiceCharge"] = 15.00m,   // should appear in payload
+                    ["TipAmount"] = 0m,       // should NOT appear in payload
                     ["LineItems"] = new List<DynamicRecord>
                     {
                     new DynamicRecord(new Dictionary<string, object?>

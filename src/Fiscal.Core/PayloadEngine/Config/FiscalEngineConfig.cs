@@ -33,5 +33,12 @@ namespace Fiscal.Core.PayloadEngine.Config
         /// e.g. Invoice → "INVOICE", Credit → "CREDIT" or "C"
         /// </summary>
         public Dictionary<string, string> ModeValues { get; init; } = new();
+
+        /// <summary>
+        /// Config-driven receipt layout. Describes what appears on the
+        /// printed slip and in what order, using the same source-prefix
+        /// pattern as the fiscal payload engine.
+        /// </summary>
+        public SlipConfig? SlipConfig { get; init; }
     }
 }

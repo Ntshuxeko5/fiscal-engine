@@ -77,6 +77,12 @@ namespace Fiscal.Core.PayloadEngine
                     : fieldDef;
 
                 object? resolved = ResolveField(fieldName, effectiveDef, context);
+
+                if (resolved is null && fieldConfig?.Default is not null)
+                {
+                    resolved = fieldConfig.Default;
+                }
+
                 if (resolved is not null)
                 {
                     record.Set(fieldName, resolved);
@@ -156,6 +162,8 @@ namespace Fiscal.Core.PayloadEngine
                 return BuildRecord(nested, context);
             }
 
+
+
             return fieldDef;
         }
 
@@ -181,7 +189,8 @@ namespace Fiscal.Core.PayloadEngine
                     return BuildRecord(nestedConfig, context);
 
                 case JsonValueKind.Array:
-                    return ResolveArray(element, context);
+                    return ResolveArrayField(element, context);
+
 
                 case JsonValueKind.Number:
                     return element.GetDecimal();
@@ -197,7 +206,33 @@ namespace Fiscal.Core.PayloadEngine
             }
         }
 
-        private object ResolveArray(JsonElement arrayElement, FiscalContext context)
+        private object? ResolveArrayField(JsonElement arrayElement, FiscalContext context)
+        {
+            JsonElement? firstElement = null;
+            foreach (var element in arrayElement.EnumerateArray())
+            {
+                firstElement = element;
+                break;
+            }
+
+            if (firstElement is null)
+            {
+                return new List<object?>();
+            }
+
+            // Object elements = line-item template, loop over POS LineItems
+            // e.g. "invoiceItems": [ { "Sku": "OpsContext.Sku", ... } ]
+            if (firstElement.Value.ValueKind == JsonValueKind.Object)
+            {
+                return ResolveLineItemArray(arrayElement, context);
+            }
+
+            // String/literal elements = plain array, resolve each independently
+            // e.g. "taxCodes": [ "Config:TaxCode" ]
+            return ResolveLiteralArray(arrayElement, context);
+        }
+
+        private object ResolveLineItemArray(JsonElement arrayElement, FiscalContext context)
         {
             var results = new List<DynamicRecord>();
 
@@ -223,8 +258,7 @@ namespace Fiscal.Core.PayloadEngine
 
                 foreach (var prop in template.Value.EnumerateObject())
                 {
-                    object? value = ResolveField(
-                        prop.Name, prop.Value, lineItemContext);
+                    object? value = ResolveField(prop.Name, prop.Value, lineItemContext);
                     if (value is not null)
                     {
                         itemRecord.Set(prop.Name, value);
@@ -232,6 +266,33 @@ namespace Fiscal.Core.PayloadEngine
                 }
 
                 results.Add(itemRecord);
+            }
+
+            return results;
+        }
+
+        /// <summary>
+        /// Resolves a plain literal array - each element resolved independently,
+        /// no looping over POS line items. Used for fields like taxCodes
+        /// where the array is a fixed set of values, not a per-item template.
+        /// </summary>
+        private List<object?> ResolveLiteralArray(JsonElement arrayElement, FiscalContext context)
+        {
+            var results = new List<object?>();
+
+            foreach (JsonElement element in arrayElement.EnumerateArray())
+            {
+                object? resolved = element.ValueKind == JsonValueKind.String
+                    ? ResolveMapping(element.GetString() ?? string.Empty, context)
+                    : element.ValueKind switch
+                    {
+                        JsonValueKind.Number => element.GetDecimal(),
+                        JsonValueKind.True => true,
+                        JsonValueKind.False => false,
+                        _ => null
+                    };
+
+                results.Add(resolved);
             }
 
             return results;

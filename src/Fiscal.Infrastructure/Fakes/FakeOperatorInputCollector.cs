@@ -18,13 +18,16 @@ namespace Fiscal.Infrastructure.Fakes
     public class FakeOperatorInputCollector : IOperatorInputCollector
     {
         private readonly string? _fiscalNo;
+        private readonly string? _refundReason;
         private readonly Dictionary<string, string> _buyerValues;
 
         public FakeOperatorInputCollector(
             string? fiscalNo = null,
+            string? refundReason = null,
             Dictionary<string, string>? buyerValues = null)
         {
             _fiscalNo = fiscalNo;
+            _refundReason = refundReason;
             _buyerValues = buyerValues ?? new Dictionary<string, string>();
         }
 
@@ -35,6 +38,8 @@ namespace Fiscal.Infrastructure.Fakes
             {
                 context.OperatorInput.Set("fiscalNo", _fiscalNo);
             }
+            if (_refundReason is not null)
+                context.OperatorInput.Set("refundReason", _refundReason);
 
             if (context.Check.Data.Get<bool>("IsB2B"))
             {

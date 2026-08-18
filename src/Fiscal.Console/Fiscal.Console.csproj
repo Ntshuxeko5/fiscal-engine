@@ -13,9 +13,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="configs\fiscal-config.sample.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+     <None Update="configs\fiscal-config.sample.json">
+         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </None>
+     <None Update="configs\fiscal-config.malawi.json">
+         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </None>
+     <None Update="configs\Local\fiscal-edge-credentials.local.json">
+         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </None>
   </ItemGroup>
 
 </Project>

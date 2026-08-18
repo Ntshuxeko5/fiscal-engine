@@ -36,6 +36,17 @@ namespace Fiscal.Core.Validation
                 return ValidateWithFormConfig(context);
             }
 
+            //Credit notes require a refund reason, so check that first
+            if (context.Mode == TransactionMode.Credit)
+            {
+                string? reason = context.OperatorInput.Get<string>("refundReason");
+                if (string.IsNullOrWhiteSpace(reason))
+                {
+                    return FiscalValidationResult.Failure(
+                        "Credit notes require a refund reason.");
+                }
+            }
+
             // Fallback: just check BuyerTaxNumber exists
             string? taxNumber = context.OperatorInput.Get<string>("BuyerTaxNumber");
             if (string.IsNullOrWhiteSpace(taxNumber))

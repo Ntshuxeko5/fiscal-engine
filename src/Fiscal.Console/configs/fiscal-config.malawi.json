@@ -1,0 +1,121 @@
+{
+  "TenderMediaNumber": 4,
+  "ModeValues": {
+    "Invoice": "S",
+    "Credit": "R"
+  },
+  "StaticValues": {
+    "SellerName": "Protea Hotels By Marriot Blantyre Ryalls",
+    "TerminalId": "58c945a2-3050-4cee-8582-0efbfbeb1a75",
+    "CurrencyType": "MWK",
+    "TaxCode": "A"
+  },
+  "BuyerInfoForm": {
+    "TriggerLabel": "B2B Sale",
+    "Fields": [
+      {
+        "Key": "BuyerTaxNumber",
+        "Label": "Customer TIN",
+        "Required": true,
+        "Min": 8,
+        "Max": 8
+      },
+      {
+        "Key": "BuyerName",
+        "Label": "Customer Name",
+        "Required": true
+      },
+      {
+        "Key": "BuyerAddress",
+        "Label": "Customer Address",
+        "Required": false
+      }
+    ]
+  },
+  "SlipConfig": {
+    "Width": 40,
+    "Sections": [
+      { "Type": "line" },
+      {
+        "Type": "text",
+        "Value": "FISCAL RECEIPT",
+        "Align": "center"
+      },
+      { "Type": "line" },
+      {
+        "Type": "field",
+        "Label": "Invoice",
+        "FieldValue": "OpsContext.TransactionId"
+      },
+      {
+        "Type": "field",
+        "Label": "Fiscal No.",
+        "FieldValue": "FiscalResult.FiscalReceiptNumber"
+      },
+      {
+        "Type": "field",
+        "Label": "Verify",
+        "FieldValue": "FiscalResult.VerificationUrl"
+      },
+      { "Type": "line" },
+      {
+        "Type": "items",
+        "LabelField": "OpsContext.Name",
+        "ValueField": "OpsContext.Amount"
+      },
+      { "Type": "line" },
+      {
+        "Type": "field",
+        "Label": "Total",
+        "FieldValue": "OpsContext.TotalDue"
+      },
+      { "Type": "line" }
+    ]
+  },
+  "Payload": {
+    "TerminalId": "Config:TerminalId",
+    "CustomerTin": {
+      "Value": "Input:BuyerTaxNumber",
+      "Default": ""
+    },
+    "customerAddress": {
+      "Value": "Input:BuyerAddress",
+      "Default": ""
+    },
+    "InvoiceNumber": "OpsContext.TransactionId",
+    "OriginalInvoiceNumber": {
+      "Value": "Input:fiscalNo",
+      "Default": ""
+    },
+    "IssuerName": "Config:SellerName",
+    "CustomerName": "Input:BuyerName",
+    "ReceiptTypeCode": "Mode:documentType",
+    "currencyType": "Config:CurrencyType",
+    "conversionRate": 1,
+    "buyerAuthorizationCode": {
+      "Value": "Input:BuyerAuthCode",
+      "Default": ""
+    },
+    "isExport": false,
+    "isReliefSupply": false,
+    "RefundReason": {
+      "Value": "Input:refundReason",
+      "Default": ""
+    },
+    "invoiceItems": [
+      {
+        "ItemSequenceNumber": "OpsContext.LineNumber",
+        "ItemDesc": "OpsContext.Name",
+        "Quantity": "OpsContext.Quantity",
+        "UnitPrice": "OpsContext.UnitPrice",
+        "isTaxInclusive": true,
+        "TotalAmount": "OpsContext.Amount",
+        "itemCode": "OpsContext.Sku",
+        "isService": true,
+        "discount": 0,
+        "productCode": "OpsContext.Sku",
+        "taxCodes": [ "Config:TaxCode" ]
+      }
+    ]
+  }
+}

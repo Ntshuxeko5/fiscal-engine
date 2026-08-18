@@ -35,5 +35,12 @@ namespace Fiscal.Core.PayloadEngine.Config
         /// Null means always include.
         /// </summary>
         public string? IncludeIf { get; init; }
+
+        /// <summary>
+        /// Value to use if Value resolves to null. Use this for fields
+        /// the API requires present even when empty (e.g. optional
+        /// customer fields that must be sent as "" rather than omitted).
+        /// </summary>
+        public string? Default { get; init; }
     }
 }

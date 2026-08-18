@@ -163,7 +163,7 @@ namespace Fiscal.Core.PayloadEngine
             }
 
 
-           
+
             return fieldDef;
         }
 

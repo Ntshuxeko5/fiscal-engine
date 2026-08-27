@@ -58,8 +58,10 @@ namespace Fiscal.Core.PayloadEngine
         {
             var record = new DynamicRecord();
 
-            foreach (var (fieldName, fieldDef) in configNode)
+            foreach (var kvp in configNode)
             {
+                string fieldName = kvp.Key;
+                object fieldDef = kvp.Value;
                 // Try to extract a PayloadFieldConfig (for IncludeIf support)
                 PayloadFieldConfig? fieldConfig = TryExtractFieldConfig(fieldDef);
 

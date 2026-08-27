@@ -49,7 +49,7 @@ namespace Fiscal.Core.PayloadEngine
 
             // Parse: "OpsContext.ServiceCharge > 0"
             //         ↑ left                  ↑ op ↑ right
-            (string left, string op, string right) = ParseCondition(condition);
+            (string left, string op, string right) = ParseCondition(condition!);
 
             object? leftValue = ResolveLeft(left, context);
             return EvaluateComparison(leftValue, op, right);

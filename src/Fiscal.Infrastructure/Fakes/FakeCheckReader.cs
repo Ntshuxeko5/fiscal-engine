@@ -17,7 +17,7 @@ namespace Fiscal.Infrastructure.Fakes
             var check = new PosCheck(new DynamicRecord(
                 new Dictionary<string, object?>
                 {
-                    ["TransactionId"] = "TXN-0004",
+                    ["TransactionId"] = "TXN-0005",
                     ["CashierId"] = "CSH-42",
                     ["TotalDue"] = 12000.00m,
                     ["IsB2B"] = false,
